@@ -2,83 +2,38 @@
 #include <time.h>
 using namespace std;
 
-const int matrix_size = 10;
-
-void create_matrix(int matrix_1[matrix_size][matrix_size], int matrix_size, int number = 10){
-    for (int i = 0; i < matrix_size; i++){
-        for (int j = 0; j < matrix_size; j++){
-            matrix_1[i][j] = 0 + rand() % number;
-        }
+void create_array(int* array_1, int size){
+    for (int i = 0; i < size; i++){
+        *(array_1 + i) = rand() % 10;
     }
 }
 
-void show_matrix(int matrix_1[matrix_size][matrix_size], int matrix_size){
-    for (int i = 0; i < matrix_size; i++){
-        for (int j = 0; j < matrix_size; j++){
-            cout << matrix_1[i][j] << " ";
-        }
-        cout << endl;
+void show_array(int* array_1, int size){
+    for (int i = 0; i < size; i++){
+        cout << *(array_1 + i) << " ";
     }
     cout << endl;
 }
 
-void bubble_sort(int matrix_1[matrix_size][matrix_size], int matrix_size){
-    create_matrix(matrix_1, matrix_size);
-    show_matrix(matrix_1, matrix_size);
-    for (int i = 0; i < matrix_size; i++){
-        for (int j = 0; j < matrix_size; j++){
-            bool flag = true;
-            for (int k = 0; k < matrix_size - (j + 1); k++) { 
-                if (matrix_1[i][k] > matrix_1[i][k + 1]) {
-                    flag = false;
-                    swap (matrix_1[i][k], matrix_1[i][k + 1]);
-                }
-            }
-            if (flag) {
-              break;
-            }
-        }
-    }
-    show_matrix(matrix_1, matrix_size);
-}
-
-void quick_sort(int matrix_1[matrix_size][matrix_size], int matrix_size) {
-    for (int k = 0; k < matrix_size; k++){
-        int i = 0;
-        int j = matrix_size - 1;
-        int mid = matrix_1[k][matrix_size / 2];
-        
-        do {
-            while(matrix_1[k][i] < mid) {
-                i++;
-            }
-            while(matrix_1[k][j] > mid) {
-                j--;
-            }
-    
-            if (i <= j) {
-                swap (matrix_1[k][i], matrix_1[k][j]);
-    
-                i++;
-                j--;
-            }
-        } while (i <= j);
-    
-    
-        if(j > 0) {
-            quick_sort(matrix_1, j + 1);
-        }
-        if (i < matrix_size) {
-            quick_sort(matrix_1[i], matrix_size - i);
-        }
+void unite_arrays(int* array_1, int* array_2, int size){
+    for (int i = 0; i < size; i++){
+        *(array_2 + i) = *(array_1 + i);
     }
 }
 
 int main(){
+    //Question 1
+    cout << "Question 1\n\n";
     srand(time(NULL));
-    int user_number;
-    int matrix_1[matrix_size][matrix_size];
-    quick_sort(matrix_1, matrix_size);
-
+    const int size = 10;
+    int array_1[size];
+    int array_2[size];
+    create_array(array_1, size);
+    cout << "Array 1: \n";
+    show_array(array_1, size);
+    cout << "Array 2: \n";
+    unite_arrays(array_1, array_2, size);
+    show_array(array_2, size);
+    
     return 0;
 }
