@@ -1,5 +1,6 @@
 #include <iostream> 
 #include <time.h>
+#include <conio.h>
 using namespace std;
 
 const int width = 32; //width of matrix
@@ -48,8 +49,8 @@ int* find_cell(char field[height][width], int* coords, int ship_long) {
 }
 
 int* find_enemy_cell(char field[height][width], int* enemy_coords, int ship_long) {
-	int x = (rand() % 10) + 20;
-	int y = (rand() % 10) + 2;
+	int y = (rand() % 10) + 20;
+	int x = (rand() % 10) + 2;
 
 	enemy_coords[0] = x;
 	enemy_coords[1] = y;
@@ -68,9 +69,9 @@ bool is_occupied(char field[height][width], int* coords, int ship_long, int dire
 	int y = coords[1];
 
 
-
 	if (field[x][y] == '@') {
 		if (field[x - 1][y] != '%' && field[x][y - 1] != '%' && field[x - 1][y - 1] != '%' && field[x + 1][y] != '%' && field[x][y + 1] != '%' && field[x + 1][y + 1] != '%' && field[x + 1][y - 1] != '%' && field[x - 1][y + 1] != '%') {
+
 			if (ship_long == 1) {
 				return false;
 			}
@@ -169,6 +170,27 @@ bool is_occupied(char field[height][width], int* coords, int ship_long, int dire
 		}
 	}
 	return true;
+}
+
+int* control(char field[height][width], int* coords) {
+	int step = _getch();
+	int x = coords[1];
+	int y = coords[0];
+
+	switch (step){
+		case 72:
+			++y;
+			cout << y << endl;
+		case 80:
+			y--;
+		case 77:
+			x++;
+		case 75:
+			x--;
+	}
+	coords[1] = x;
+	coords[0] = y;
+	return coords;
 }
 
 void create_field(char field[height][width], int* coords) {
@@ -317,7 +339,6 @@ void create_enemy_field(char enemy_field[height][width], int* enemy_coords) {
 		enemy_field[x][y] = '%';
 
 		all_ships--;
-		print_field(enemy_field);
 	}
 
 	for (double_decker; double_decker > 0; double_decker--) {
@@ -339,7 +360,6 @@ void create_enemy_field(char enemy_field[height][width], int* enemy_coords) {
 		else enemy_field[x + 1][y] = '%';
 
 		all_ships--;
-		print_field(enemy_field);
 	}
 
 	for (triple_decker; triple_decker > 0; triple_decker--) {
@@ -373,7 +393,6 @@ void create_enemy_field(char enemy_field[height][width], int* enemy_coords) {
 		}
 
 		all_ships--;
-		print_field(enemy_field);
 	}
 
 
@@ -410,8 +429,6 @@ void create_enemy_field(char enemy_field[height][width], int* enemy_coords) {
 		enemy_field[x + 3][y] = '%';
 	}
 
-	print_field(enemy_field);
-
 	all_ships--;
 }
 
@@ -423,6 +440,9 @@ int main() {
 
 	//enemy coordinate array
 	int enemy_coords[coords_size] = {0, 0};
+
+	//player coords array
+	int player_coords[coords_size] = {2, 20};
 
 	//Matrix (the left field is ours, the right field is the enemy)
 	char field[height][width] = { {"-------------------------------"},
@@ -457,7 +477,15 @@ int main() {
 
 	create_field(field, coords);
 	print_field(field);
-	print_field(enemy_field);
 	create_enemy_field(enemy_field, enemy_coords);
+	print_field(enemy_field);
+
+	//main loop
+	while (true) {
+		control(field, player_coords);
+		cout << player_coords[0] << " ";
+		cout << player_coords[1] << endl;
+	}
+
 	return 0;
 }
