@@ -8,7 +8,7 @@ const int height = 14; //height of matrix
 const int coords_size = 2; // coordinate array size
 
 
-enum Directions{up = 1, down, left, right};
+enum Directions { up = 1, down, left, right };
 
 
 
@@ -22,13 +22,25 @@ void print_field(char field[height][width]) {
 				cout << "\033[3;40;30m  \033[0m";
 			}
 			else if (field[i][j] == '@') {
-				cout << "\033[3;44;30m  \033[0m";
+				cout << "\033[3;46;30m  \033[0m";
 			}
 			else if (field[i][j] == '%') {
 				cout << "\033[3;47;30m  \033[0m";
 			}
 			else if (field[i][j] == '#') {
 				cout << "\033[3;42;30m  \033[0m";
+			}
+			else if (field[i][j] == '*') {
+				cout << "\033[3;43;30m  \033[0m";
+			}
+			else if (field[i][j] == '!') {
+				cout << "\033[3;41;30m  \033[0m";
+			}
+			else if (field[i][j] == '^') {
+				cout << "\033[3;40;30m  \033[0m";
+			}
+			else if (field[i][j] == '&') {
+				cout << "\033[3;44;30m  \033[0m";
 			}
 		}
 		j = 0;
@@ -39,8 +51,8 @@ void print_field(char field[height][width]) {
 
 //function for getting a random cell on the field
 int* find_cell(char field[height][width], int* coords, int ship_long) {
-	int x = (rand() % 10) + 1;
-	int y = (rand() % 10) + 2;
+	int x = (rand() % 10) + 2;
+	int y = (rand() % 10) + 1;
 
 	coords[0] = x;
 	coords[1] = y;
@@ -172,34 +184,13 @@ bool is_occupied(char field[height][width], int* coords, int ship_long, int dire
 	return true;
 }
 
-int* control(char field[height][width], int* coords) {
-	int step = _getch();
-	int x = coords[1];
-	int y = coords[0];
-
-	switch (step){
-		case 72:
-			++y;
-			cout << y << endl;
-		case 80:
-			y--;
-		case 77:
-			x++;
-		case 75:
-			x--;
-	}
-	coords[1] = x;
-	coords[0] = y;
-	return coords;
-}
-
 void create_field(char field[height][width], int* coords) {
 	int single_deck = 4;
 	int double_decker = 3;
 	int triple_decker = 2;
 	int four_decker = 1;
 	int all_ships = 10;
-	
+
 	int direction = direction_generation();
 	int second_direction = 0;
 
@@ -436,13 +427,13 @@ int main() {
 	srand(time(NULL));
 
 	//coordinate array
-	int coords[coords_size] = {0, 0};
+	int coords[coords_size] = { 0, 0 };
 
 	//enemy coordinate array
-	int enemy_coords[coords_size] = {0, 0};
+	int enemy_coords[coords_size] = { 0, 0 };
 
-	//player coords array
-	int player_coords[coords_size] = {2, 20};
+	//enemy attack array
+	int enemy_attack[coords_size] = { 0, 0 };
 
 	//Matrix (the left field is ours, the right field is the enemy)
 	char field[height][width] = { {"-------------------------------"},
@@ -461,30 +452,121 @@ int main() {
 								  {"-------------------------------"} };
 
 	char enemy_field[height][width] = { {"-------------------------------"},
-									    {"-------------------############"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------#@@@@@@@@@@#"},
-									    {"-------------------############"},
-									    {"-------------------------------"} };
+										{"-------------------############"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------#@@@@@@@@@@#"},
+										{"-------------------############"},
+										{"-------------------------------"} };
 
 	create_field(field, coords);
 	print_field(field);
 	create_enemy_field(enemy_field, enemy_coords);
 	print_field(enemy_field);
 
+	int player_points = 0;
+	int enemy_points = 0;
+	int player_x = 20;
+	int player_y = 2;
+	int last_x = 20;
+	int last_y = 2;
+	char last_symbol = '@';
+	bool is_attack = false;
+	bool is_step = true;
+
 	//main loop
 	while (true) {
-		control(field, player_coords);
-		cout << player_coords[0] << " ";
-		cout << player_coords[1] << endl;
+		is_step = true;
+		is_attack = true;
+		field[player_y][player_x] = '*';
+
+		while (is_step == true) {
+			print_field(field);
+			int step = _getch();
+
+			switch (step) {
+			case 119:
+				if (player_y > 2) {
+					player_y--;
+					is_step = false;
+				}
+				break;
+			case 115:
+				if (player_y < 11) {
+					player_y++;
+					is_step = false;
+				}
+				break;
+			case 100:
+				if (player_x < 29) {
+					player_x++;
+					is_step = false;
+				}
+				break;
+			case 97:
+				if (player_x > 20) {
+					cout << "fds";
+					player_x--;
+					is_step = false;
+				}
+				break;
+			case 32:
+				if (last_symbol == '@') {
+					if (enemy_field[player_y][player_x] == '%') {
+						field[player_y][player_x] = '!';
+						last_symbol = field[player_y][player_x];
+						player_points++;
+						is_step = false;
+					}
+					else if (enemy_field[player_y][player_x] == '@') {
+						field[player_y][player_x] = '^';
+						last_symbol = field[player_y][player_x];
+						is_attack = false;
+						is_step = false;
+					}
+				}
+				break;
+			}
+		}
+
+		if (player_points == 20) {
+			cout << "YOU WON!" << endl;
+			break;
+		}
+		field[last_y][last_x] = last_symbol;
+		last_symbol = field[player_y][player_x];
+		last_x = player_x;
+		last_y = player_y;
+
+		while (!is_attack) {
+			enemy_attack[0] = (rand() % 10) + 2;
+			enemy_attack[1] = (rand() % 10) + 1;
+			if (field[enemy_attack[0]][enemy_attack[1]] == '%') {
+				field[enemy_attack[0]][enemy_attack[1]] = '!';
+
+				enemy_points++;
+				if (enemy_points == 20) {
+					cout << "YOU LOSED!" << endl;
+					break;
+				}
+				continue;
+			}
+			else if (field[enemy_attack[0]][enemy_attack[1]] == '@') {
+				field[enemy_attack[0]][enemy_attack[1]] = '^';
+				is_attack = true;
+			}
+		}
+		if (enemy_points == 20) {
+			print_field(enemy_field);
+			break;
+		}
 	}
 
 	return 0;
