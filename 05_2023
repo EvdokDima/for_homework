@@ -1,39 +1,110 @@
 #include <iostream>
-#include <time.h>
+#include <string>
 using namespace std;
 
-void create_array(int* array_1, int size){
-    for (int i = 0; i < size; i++){
-        *(array_1 + i) = rand() % 10;
-    }
-}
+class Person {
+protected:
+    string name;
+    string dateOfBirth;
 
-void show_array(int* array_1, int size){
-    for (int i = 0; i < size; i++){
-        cout << *(array_1 + i) << " ";
+public:
+    Person(const string& name, const string& dateOfBirth): 
+        name(name), dateOfBirth(dateOfBirth) {}
+
+    string getName() const {
+        return name;
+    }
+
+    string getDateOfBirth() const {
+        return dateOfBirth;
+    }
+};
+
+class Student : public Person {
+private:
+    string group;
+    int course;
+
+public:
+    Student(const string& name, const string& dateOfBirth, const string& group, int course):
+       Person(name, dateOfBirth), group(group), course(course) {}
+
+    string getGroup() const {
+        return group;
+    }
+
+    int getCourse() const {
+        return course;
+    }
+};
+
+class Teacher : public Person {
+private:
+    string* taughtGroups;
+    int numTaughtGroups;
+    int* taughtCourses;
+    int numTaughtCourses;
+
+public:
+    Teacher(const string& name, const string& dateOfBirth, const string* taughtGroups, int numTaughtGroups, const int* taughtCourses, int numTaughtCourses): 
+        Person(name, dateOfBirth), numTaughtGroups(numTaughtGroups), numTaughtCourses(numTaughtCourses) {
+        this->taughtGroups = new string[numTaughtGroups];
+        this->taughtCourses = new int[numTaughtCourses];
+
+        for (int i = 0; i < numTaughtGroups; i++) {
+            this->taughtGroups[i] = taughtGroups[i];
+        }
+
+        for (int i = 0; i < numTaughtCourses; i++) {
+            this->taughtCourses[i] = taughtCourses[i];
+        }
+    }
+
+    ~Teacher() {
+        delete[] taughtGroups;
+        delete[] taughtCourses;
+    }
+
+    string* getTaughtGroups() const {
+        return taughtGroups;
+    }
+
+    int getNumTaughtGroups() const {
+        return numTaughtGroups;
+    }
+
+    int* getTaughtCourses() const {
+        return taughtCourses;
+    }
+
+    int getNumTaughtCourses() const {
+        return numTaughtCourses;
+    }
+};
+
+int main() {
+    cout << "Input name of student: ";
+
+    Person person("John Doe", "1990-01-01");
+    cout << "Person: " << person.getName() << ", " << person.getDateOfBirth() << endl;
+
+    Student student("Alice Smith", "1995-05-05", "Group A", 3);
+    cout << "Student: " << student.getName() << ", " << student.getDateOfBirth() << ", " << student.getGroup() << ", " << student.getCourse() << endl;
+
+    string taughtGroups[] = { "Group A", "Group B" };
+    int taughtCourses[] = { 1, 2 };
+    Teacher teacher("Jane Johnson", "1980-12-12", taughtGroups, 2, taughtCourses, 2);
+    cout << "Teacher: " << teacher.getName() << ", " << teacher.getDateOfBirth() << endl;
+    cout << "Taught Groups: ";
+    for (int i = 0; i < teacher.getNumTaughtGroups(); i++) {
+        cout << teacher.getTaughtGroups()[i] << " ";
     }
     cout << endl;
-}
-
-void unite_arrays(int* array_1, int* array_2, int size){
-    for (int i = 0; i < size; i++){
-        *(array_2 + i) = *(array_1 + i);
+    cout << "Taught Courses: ";
+    for (int i = 0; i < teacher.getNumTaughtCourses(); i++) {
+        cout << teacher.getTaughtCourses()[i] << " ";
     }
-}
+    cout << endl;
 
-int main(){
-    //Question 1
-    cout << "Question 1\n\n";
-    srand(time(NULL));
-    const int size = 10;
-    int array_1[size];
-    int array_2[size];
-    create_array(array_1, size);
-    cout << "Array 1: \n";
-    show_array(array_1, size);
-    cout << "Array 2: \n";
-    unite_arrays(array_1, array_2, size);
-    show_array(array_2, size);
-    
     return 0;
 }
